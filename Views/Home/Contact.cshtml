@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.CurrentUser = User.Identity.Name;
+}
+
+<h2>Enable Features</h2>
+
+
+<p>Welcome @ViewBag.CurrentUser</p>
+@*<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>*@
+
+<hr />
+
+<script>
+    var app = angular.module("myScript", []).controller("myCtrl", ["$scope", function ($scope) {
+        Prism.highlightAll();
+        $scope.browsers = [
+            { browserName: "Chrome" },
+            { browserName: "Internet Explorer" },
+            { browserName: "Firefox" }
+        ];
+
+        $scope.osVersions = [
+            { version: "10", name: "Windows 10" },
+            { version: "7", name: "Windows 7" }
+        ];
+
+        $scope.screenResolutions = [
+            { res: "1920x1080" }];
+
+        $scope.findElementTypes = [
+            { by: "Id" },
+            { by: "Name" },
+            { by: "Xpath" }
+        ];
+
+        $scope.createdElements = [
+            { elementType: "", elementSearch: "", elementToClick: false, textToEnter: "" }
+        ];
+
+        $scope.elementsToFind = [];
+        $scope.chosenBrowser = "Chrome";
+        $scope.osPlatform = "Windows";
+        $scope.osVersion = "10";
+        $scope.screenRes = "1920*1080";
+        $scope.findElementBy = "";
+        $scope.elementSearcher = "";
+        $scope.sendKeysValue = "";
+        $scope.clickElement = "";
+
+        $scope.submitNewElement = (function (formData) {
+            var codeBuilderString = "elementToFind = driver.FindElement(By." + $scope.findElementBy.by + "(\x22" + $scope.elementSearcher + "\x22));";
+
+            if ($scope.clickElement !== "") codeBuilderString += "\nelementToFind.Click();";
+            if ($scope.sendKeysValue !== "") codeBuilderString += "\nelementToFind.SendKeys(\x22" + $scope.sendKeysValue + "\");";
+
+            $scope.createdElements.push(
+                {
+                    elementType: $scope.findElementBy.by,
+                    elementSearch: $scope.elementSearcher,
+                    textToEnter: $scope.sendKeysValue,
+                    elementToClick: $scope.clickElement,
+                    elementStringTotal: codeBuilderString
+                });
+
+            $scope.elementsToFind.push(codeBuilderString);
+
+            $scope.findElementBy = "";
+            $scope.elementSearcher = "";
+            $scope.sendKeysValue = "";
+            $scope.sendKeys = false;
+            $scope.clickElement = false;
+
+        });
+
+        $scope.myCode = function () {
+            //Prism.highlight(myCode, Prism.languages.csharp);
+            Prism.highlightAll();
+        };
+
+        $scope.addNum = function () {
+            $scope.count = $scope.count + 1;
+            // How to get Element by id in angular: var aa = angular.element(document.getElementById("codeBuilder"));
+        };
+
+        $scope.addItem = function () {
+            $scope.errortext = "";
+            if (!$scope.addMe) { return; }
+            if ($scope.elementsToFind.indexOf($scope.addMe) == -1) {
+                $scope.elementsToFind.push("IWebElement " + $scope.addMe + " = WaitAndFindElementById(\"" + $scope.addMe + "\", driver);");
+                $scope.addMe = null;
+            } else {
+                $scope.errortext = "The item is already found in your script.";
+            }
+        }
+
+        $scope.removeItem = function (x) {
+            $scope.errortext = "";
+            $scope.elementsToFind.splice(x, 1);
+        };
+    }]);
+</script>
+<div ng-app="myScript" ng-controller="myCtrl">
+
+    <!-- Browser -->
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label" data-toggle="tooltip" title="The browser to run the tests with.">Browser</label>
+        <div class="col-sm-9">
+            <div class="input-group mb-3">
+                @*<input type="text" class="form-control" name="input" ng-change="myCode()" ng-model="chosenBrowser.browserName" required ng-trim="false" placeholder="Please choose a browser..." readonly>*@
+                <select class="btn btn-outline-dark dropdown-toggle" ng-model="chosenBrowser" ng-options="y.browserName for (x, y) in browsers"></select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen Resolution -->
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Screen Resolution</label>
+        <div class="col-sm-10">
+            <select class="btn btn-outline-dark dropdown-toggle" ng-model="screenRes" ng-options="y.res for (x, y) in screenResolutions"></select>
+        </div>
+    </div>
+
+    <!-- URL Navigation -->
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">URL</label>
+        <div class="col-sm-10">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="input" ng-change="myCode()" ng-model="urlValue" required ng-trim="false" placeholder="Please type URL...">
+            </div>
+        </div>
+    </div>
+
+    <p>@*The button has been clicked {{count}} times.*@</p>
+
+    <ul class="list-group" ng-repeat="x in elementsToFind">
+        <li class="list-group-item">
+            {{x}} <span ng-click="removeItem($index)">
+                <button class="btn btn-outline-primary pull-right">Remove</button>
+            </span>
+        </li>
+    </ul>
+
+    <br />
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Add an Element</div>
+        <div class="panel-body">
+            <form ng-submit="submitNewElement()">
+                <div class="form-group row">
+                    <label for="findElementBySelect" class="col-sm-2 col-form-label">Find Element By</label>
+                    <div class="col-sm-10">
+                        <select id="findElementBySelect" class="btn btn-outline-dark dropdown-toggle" ng-model="findElementBy" ng-options="y.by for (x, y) in findElementTypes" required></select>
+                    </div>
+                </div>
+
+                <!-- only show this column if there is data inside of findElement -->
+                <div ng-show="findElementBy.by != null">
+                    <div class="form-group row">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">Input {{findElementBy.by}}</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputPassword3" ng-model="elementSearcher" placeholder="{{findElementBy.by}} ..." required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-2">Arguments</div>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="clickElement" ng-model="clickElement">
+                                <label class="form-check-label" for="clickElement">
+                                    Click on Element?
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sendKeys" ng-model="sendKeys">
+                                <label class="form-check-label" for="sendKeys">
+                                    Type text to Element?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-show="sendKeys != null && sendKeys != false">
+                        <div class="form-group row">
+                            <label for="sendKeysValue" class="col-sm-2 col-form-label">Text to enter</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="sendKeysValue" id="sendKeysValue" placeholder="Type text here...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <input type="submit" class="btn btn-primary" value="Add to Script" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @*<ul class="list-group" ng-repeat="x in createdElements">
+            <li class="list-group-item">
+                {{x}}
+            </li>
+        </ul>*@
+    @* <p>{{errortext}}</p>*@
+
+    <br />
+
+    <div class="row">
+        <div class="col-sm-12">
+            @*When the class="language-csharp" is removed, the angular content works (has something to do with the dynamic loading of the HTML...)*@
+            <pre class="language-csharp line-numbers"><code id="codeBuilder" class="">
+using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
+
+namespace SeleniumTest {
+    class Program {
+        static void Main(string[] args) {
+            IWebDriver driver;
+            DesiredCapabilities capability = DesiredCapabilities.{{chosenBrowser.browserName}}();
+
+            capability.SetCapability("browser", "{{chosenBrowser.browserName}}");
+            capability.SetCapability("os", "{{osPlatform}}");
+            capability.SetCapability("os", "{{osVersion}}");
+            capability.SetCapability("resolution", "{{screenRes.res}}");
+
+            var options = new ChromeOptionsEx();
+            options.AddArguments("disable-infobars");
+
+            driver = new RemoteWebDriver(new Uri("http://vdi-automation0:4444/wd/hub"), capability);
+            driver.Navigate().GoToUrl("{{urlValue}}");
+
+            IWebElement elementToFind;
+        @*<span ng-repeat="webElement in elementsToFind">{{webElement}}<br /></span>*@
+            Console.WriteLine(driver.Title);
+
+            driver.Quit();
+            }
+        }
+    }
+</code></pre>
+        </div>
+    </div>
+</div>

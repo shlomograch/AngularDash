@@ -1,0 +1,7 @@
+﻿@using Microsoft.Ajax.Utilities
+@{
+    ViewBag.Title = "Status";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.CurrentUser = User.Identity.Name ?? "";
+}
+<status-directive></status-directive>

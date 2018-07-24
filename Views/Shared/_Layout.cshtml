@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.CurrentUser = User.Identity.Name ?? "";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-route.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-sanitize.min.js"></script>
+
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+
+    @*<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>*@
+    @*<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-sanitize.min.js"></script>*@
+
+    <style>
+        html, body {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+
+<body ng-app="autoDashApp">
+    <div id="mySidenav" class="sidenav bg-black fixed-top">
+        <div class="icon-bar" style="width: 100%">
+            <i href="@Url.Action( "Index", "Home" )" class="fa fa-cogs bg-info dker" id="logo"></i>
+            <a href="@Url.Action( "Index", "Home" )" class="fa fa-home" id="HomeMenu"></a>
+            <a href="@Url.Action( "Index", "Execution" )" class="fa fa-cloud" id="ExecutionMenu"></a>
+            <a href="@Url.Action( "Index", "Dashboard" )" class="fa fa-history" id="DashboardCloudMenu"></a>
+        </div>
+
+        <label class="switch" style="bottom: 15px; position: absolute;">
+            <input type="checkbox" onclick="SwitchThemes()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @Scripts.Render("~/bundles/app")
+    @Scripts.Render("~/bundles/angular")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <!-- Add all page content inside this div if you want the side nav to push page content to the right (not used if you only want the sidenav to sit on top of the page -->
+    <div id="main">
+        <div class="wrapper-md body-content">
+            @RenderBody()
+        </div>
+    </div>
+
+    @RenderSection("scripts", required: false)
+    <script>
+    //document.getElementById("mySidenav").addEventListener("click", SwitchThemes);
+
+    function SwitchThemes(){
+        var myElement = document.getElementById("mySidenav").className;
+        var navBar;
+        var logo;
+
+        if (myElement === "sidenav bg-black fixed-top") {
+            myElement = 'sidenav bg-light dker fixed-top';
+            navBar = 'navbar bg-black';
+            logo = 'fa fa-cogs bg-black';
+        }
+        else {
+            myElement = 'sidenav bg-black fixed-top';
+            navBar = 'navbar bg-info dker';
+            logo = 'fa fa-cogs bg-info dker';
+        }
+        document.getElementById("mySidenav").className = myElement;
+        //document.getElementById("myNavBar").className = navBar;
+        document.getElementById("logo").className = logo;
+    }
+
+    $(document).ready(function () {
+        var $body = angular.element(document.body);
+        var $rootScope = $body.scope().$root;
+        $rootScope.$apply(function () {
+            $rootScope.currentUser = '@ViewBag.CurrentUser';
+        });
+
+        document.getElementById("mySidenav").style.width = "90px";
+        document.getElementById("main").style.marginLeft = "90px";
+        //document.getElementById("header").style.marginLeft = "90px";
+    });
+
+    function ShowProfile(){
+        alert('Show profile');
+    }
+
+    /* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
+    function openNav(){
+        document.getElementById("mySidenav").style.width = "250px";
+        document.getElementById("main").style.marginLeft = "250px";
+    }
+
+    function closeNav(){
+        document.getElementById("mySidenav").style.width = "90px";
+        document.getElementById("main").style.marginLeft = "90px";
+
+    }
+    </script>
+
+</body>
+</html>

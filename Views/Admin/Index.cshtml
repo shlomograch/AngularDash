@@ -1,0 +1,271 @@
+﻿@{
+    ViewBag.Title = "Metrics";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+
+<script>
+    var app = angular.module("myScript", []).controller("myCtrl", ["$scope", "$http", function ($scope, $http) {
+
+        $scope.findApplication;
+
+        $http.get("http://api.autodash.nelnet.net/api/GetApps")
+            .then(function (response) {
+                $scope.findApplications = response.data;
+            });
+
+        $scope.GetTestData = function (formData) {
+            if ($scope.findApplication != null) {
+                $http.get("http://api.autodash.nelnet.net/api/GetExecutedTests/" + $scope.findApplication.ApplicationName)//, { 'appName': $scope.findApplication.ApplicationName })
+                    .then(function (response) {
+                        $scope.findTests = response.data;
+                    });
+                $http.get("http://api.autodash.nelnet.net/api/GetEnvironments/" + $scope.findApplication.ApplicationName)//, { 'appName': $scope.findApplication.ApplicationName })
+                    .then(function (response) {
+                        $scope.getEnvironments = response.data;
+                    });
+
+            }
+        };
+
+        $scope.percent = 65;
+        $scope.options = {
+            animate:{
+                duration:0,
+                enabled:false
+            },
+            barColor:'#2C3E50',
+            scaleColor:false,
+            lineWidth:20,
+            lineCap:'circle'
+        };
+
+        $scope.submitApplication = function (formData) {
+
+            $http({
+                method: 'POST',
+                url: 'http://api.autodash.nelnet.net/api/AddToQueue',
+                data: "={'TestName': '" + $scope.findTestName.TestName + "','ApplicationName': '" + $scope.findApplication.ApplicationName + "','UserName': '" + $scope.currentUser + "','StackTrace': '" + $scope.stackTrace + "'" +
+                ",'ConsoleLog': '" + $scope.consoleLog + "','Utilization': '" + $scope.utilization + "','Environment': '" + $scope.environmentName.Environment + "'}",
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }).then(function (response) {
+                $.notify({
+                    // options
+                    message: 'Succesfully added ' + $scope.findTestName.TestName + ' to Queue'
+                }, {
+                        // settings
+                        type: 'success'
+                    });
+
+                // Reset data for next run.
+                $scope.findApplication = null;
+                $scope.findTestName = null;
+                $scope.stackTrace = false;
+                $scope.consoleLog = false;
+                $scope.utilization = false;
+            },
+                function (response) { // optional
+                    $.notify({
+                        // options
+                        message: 'Failed to add ' + $scope.findTestName.TestName + ' to Queue'
+                    }, {
+                            // settings
+                            type: 'danger'
+                        });
+                });
+        };
+    }]);
+
+</script>
+
+
+<div ng-app="myScript" ng-controller="myCtrl">
+    <div class="container-fluid">
+        <div class="row">
+
+                <div easypiechart options="options" percent="percent"></div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="avatar-square avatar-square-hover pull-left">
+                                <span class="initials">VR</span>
+                            </div>
+                            @*<span class="badge badge-pass" style="border: 4px solid rgba(255,255,255,1); ">Pass</span>*@
+                        </div>
+                        <div class="col-9">
+                            <div class="row">
+                                <p>Last visit: @DateTime.UtcNow.ToString("d")</p>
+                            </div>
+                            <div class="row">
+                                <p>Total tests ran: 123</p>
+                            </div>
+                            @*<div class="row">
+                                    <p>Toatal score: 2</p>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card ">
+                    <h4>Messages</h4>
+                    <p> 508 compliance tests is going to be released soon. </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <h4>Visitors</h4>
+                    <div class="row">
+                        <div class="avatar-square avatar-square-hover">
+                            <span class="initials">JD</span>
+                        </div>
+                        <div class="avatar-square avatar-square-hover">
+                            <span class="initials">VR</span>
+                        </div>
+                        <div class="avatar-square avatar-square-hover">
+                            <span class="initials">SH</span>
+                        </div>
+                        <div class="avatar-square avatar-square-hover">
+                            <span class="initials">DM</span>
+                        </div>
+                        <div class="avatar-square avatar-square-hover">
+                            <span class="initials">CH</span>
+                        </div>
+                        <div class="avatar-square avatar-square-hover">
+                            <span class="initials">IW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="card card-columns ">
+                    <div class="row">
+                        <div class="col-sm-4">
+
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="avatar-square avatar-square-hover">
+                                <h5>Total Failed</h5>
+                                <span class="initials">20</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="avatar-square avatar-square-hover">
+                                <h5>Total Informed</h5>
+                                <span class="initials">50</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <br />
+            <div class="container-fluid">
+                <div class="row">
+
+                    <div class="col-md-9" style="padding: 15px">
+                        <div class="container">
+                            <div class="row">
+                                <div class="card">
+                                    <div class="card-image">
+                                        <div class="pie"></div>
+                                    </div>
+                                    <div class="card-content" style="padding: 1px">
+                                        <h2 class="card-title">Executed Tests</h2>
+                                        <button type="button" id="show" class="btn btn-custom pull-right" aria-label="Left Align">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </button>
+                                        <p>The table is going to show which test have not yet been executed first followed by the rest of the tests.</p>
+
+                                    </div><!-- card content -->
+                                    <div class="card-reveal ">
+                                        <span class="card-title">Card Title</span> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        <p>Here is some more information about this product that is only revealed once clicked on.</p>
+                                    </div><!-- card reveal -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-content" style="padding: 1px">
+                                <h2 class="card-title">Executed Tests</h2>
+                                <button type="button" id="show" class="btn btn-custom pull-right" aria-label="Left Align">
+                                    <i class="fa fa-ellipsis-v"></i>
+                                </button>
+                                <p>The table is going to show which test have not yet been executed first followed by the rest of the tests.</p>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Test Name</th>
+                                            <th>Execuded</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>login</td>
+                                            <td><span class="badge badge-fail">Not executed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>logout</td>
+                                            <td><span class="badge badge-pass">Success</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>payment</td>
+                                            <td><span class="badge badge-fail">Not Executed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>autodebit</td>
+                                            <td><span class="badge badge-fail">Not Executed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>email</td>
+                                            <td><span class="badge badge-fail">Not Executed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>documents</td>
+                                            <td><span class="badge badge-fail">Not Executed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>paymenthistory</td>
+                                            <td><span class="badge badge-fail">Not Executed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>settings</td>
+                                            <td><span class="badge badge-fail">Not Executed</span></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div><!-- card content -->
+                            <div class="card-reveal ">
+                                <span class="card-title">Card Title</span> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                <p>Here is some more information about this product that is only revealed once clicked on.</p>
+                            </div><!-- card reveal -->
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
