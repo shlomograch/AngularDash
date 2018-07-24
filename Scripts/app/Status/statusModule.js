@@ -1,0 +1,1 @@
+﻿angular.module('statusModule', ['statusController', 'statusDirective', 'statusService']);

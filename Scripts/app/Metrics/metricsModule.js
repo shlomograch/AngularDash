@@ -1,0 +1,1 @@
+﻿angular.module('metricsModule', ['metricsController', 'metricsDirective', 'metricsService']);
