@@ -1,0 +1,166 @@
+﻿<div ng-controller="ExecutionCtrl">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Execution Options</div>
+                <div class="panel-body">
+                    <form ng-submit="submitApplication()">
+                        <div class="form-group row">
+                            <label for="applicationSelect" class="col-sm-3 col-form-label">Application:</label>
+                            <div class="col-sm-9">
+                                <select class="btn btn-light btn-outline-dark dropdown-toggle btn-block" id="applicationSelect" placeholder="Select an Application.." ng-change="GetTestData()" ng-model="findApplication" ng-options="y.ApplicationName for (x, y) in findApplications" required></select>
+                            </div>
+                        </div>
+
+
+                        <div ng-show="findApplication != null">
+                            <div class="form-group row">
+                                <label for="runAll" class="col-sm-3 col-form-label">Run All:</label>
+                                <div class="col-sm-9">
+                                    <select class="btn btn-light btn-outline-dark dropdown-toggle btn-block" id="runAll" placeholder="Select a Test.." ng-model="runAllTests" required>
+                                        <option id="yes">Yes</option>
+                                        <option id="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="runAllTests == 'Yes'">
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Which tests:</label>
+                                <fieldset class="col-sm-5">
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" ng-model="runGui">
+                                            <span class="slider"></span>
+                                        </label>
+                                        Run all GUI
+                                    </div>
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" ng-model="runApi">
+                                            <span class="slider"></span>
+                                        </label>
+                                        Run all API
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div ng-show="runAllTests == 'No'">
+                            <div class="form-group row">
+                                <label for="testname" class="col-sm-3 col-form-label">Test Name:</label>
+                                <div class="col-sm-9">
+                                    <select class="btn btn-light btn-outline-dark dropdown-toggle btn-block" id="testname" placeholder="Select a Test.." ng-model="findTestName" ng-options="y.TestName for (x, y) in findTests"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ng-show="runAllTests != null">
+                            <div class="form-group row">
+                                <label for="environmentName" class="col-sm-3 col-form-label">Environment:</label>
+                                <div class="col-sm-9">
+                                    <select class="btn btn-light btn-outline-dark dropdown-toggle btn-block" id="environmentName" placeholder="Select an Environment.." ng-model="environmentName" ng-options="y.Environment for (x, y) in getEnvironments"></select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Preferences:</label>
+                                <fieldset class="col-sm-5">
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" ng-model="stackTrace">
+                                            <span class="slider"></span>
+                                        </label>
+                                        Stack trace
+                                    </div>
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" ng-model="consoleLog">
+                                            <span class="slider"></span>
+                                        </label>
+                                        Console log
+                                    </div>
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" ng-model="utilization">
+                                            <span class="slider"></span>
+                                        </label>
+                                        Utilization
+                                    </div>
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" ng-model="scheduled">
+                                            <span class="slider"></span>
+                                        </label>
+                                        Schedule Test
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div ng-show="scheduled == true">
+                                <div class="form-group row">
+                                    <label for="scheduledDate" class="col-sm-3 col-form-label">Scheduled Time:</label>
+                                    <div class="col-sm-9">
+                                        <input type="datetime-local" id="scheduledDate" class="form-control" name="input" ng-model="todayDate" placeholder="MMMM dd hh:mm a" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="submit" class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <input id="submit" type="submit" class="btn btn-pass btn-block" value="Add to Queue" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Queued Tests</div>
+                <div class="panel-body">
+                    <table class="table table-bordered table-light table-hover">
+                        <thead>
+                            <tr>
+                                <th>Application Name</th>
+                                <th>Test Name</th>
+                                <th>Environment</th>
+                                <th>Queued Date Time</th>
+                                <th>User Name</th>
+                                <th>Stack Trace</th>
+                                <th>Utilization</th>
+                                <th>Console Log</th>
+
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="x in queuedTests">
+                            <td>
+                                {{x.ApplicationName}}
+                            </td>
+                            <td>
+                                {{x.TestName}}
+                            </td>
+                            <td>
+                                {{x.Environment}}
+                            </td>
+                            <td>
+                                {{x.QueuedDateTime}}
+                            </td>
+                            <td>
+                                {{x.UserName}}
+                            </td>
+                            <td>
+                                {{x.StackTrace}}
+                            </td>
+
+                            <td>
+                                {{x.Utilization}}
+                            </td>
+                            <td>
+                                {{x.ConsoleLog}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

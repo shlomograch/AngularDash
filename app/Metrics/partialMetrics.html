@@ -1,0 +1,182 @@
+﻿<div ng-controller="MetricsCtrl">
+    <div class="row">
+        <div id="quickStats" class="container-fluid col-md-4">
+            <div class="card" style="position: relative;width: 100%">
+                <h2>
+                    <span class="fa fa-bar-chart"></span> Quick Stats
+                    <button class="fa fa-search btn btn-dark pull-right" ng-click="showme=false"></button>
+                </h2>
+                <div class="cardcontainer" style="height: 460px">
+                    <div class="card" ng-show="showme" ng-hide="showme">
+                        <div style="margin-bottom: 15px">
+                            <i class="fa fa-pull-right fa-times" ng-click="showme=true;"></i>
+                        </div>
+                        <div class="row" style="margin-bottom: 5px;">
+                            <div class="col-md-4">
+                                <span class="pull-left">
+                                    Application:
+                                </span>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="btn btn-light btn-outline-dark dropdown-toggle btn-block pull-right" id="applicationSelect" ng-change="GetTestData()" ng-model="findApplication" ng-options="y.ApplicationName for (x, y) in findApplicationsList" required>
+                                    <option value="">- Choose Application -</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div ng-show="findApplication != null">
+                            <div class="row" style="margin-bottom: 5px;">
+                                <div class="col-md-4">
+                                    <span class="pull-left">
+                                        Enviroment:
+                                    </span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select class="btn btn-light btn-outline-dark dropdown-toggle btn-block pull-right" id="environmentName" ng-model="environmentName" ng-options="y.Environment for (x, y) in getEnvironmentsList">
+                                        <option value="">- Choose Environment -</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="environmentName != null">
+                            <div class="row" style="margin-bottom: 5px;">
+                                <div class="col-md-4">
+                                    <span class="pull-left">
+                                        Start date:
+                                    </span>
+                                </div>
+                                <div class="col-md-8">
+                                    <div ng-cloak="" class="pull-right" >
+                                        <md-datepicker  ng-model="todays" md-placeholder="Enter start date"  ng-change="changedValueStart(todays)" md-open-on-focus></md-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-show="todays != null" class="row" style="margin-bottom: 5px;">
+                                <div class="col-md-4">
+                                    <span class="pull-left">
+                                        End date:
+                                    </span>
+                                </div>
+                                <div class="col-md-8">                                    
+                                    <div ng-cloak="" class="pull-right">
+                                        <md-datepicker ng-model="enddt" md-placeholder="Enter end date" ng-change="changedValueEnd(enddt)" md-open-on-focus></md-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="enddt!=null">
+                            <button class="btn btn-dark pull-right" style="width: 100%" ng-click="showme=true; GetMetrics();">Submit</button>
+                        </div>
+                    </div>
+                    <div ng-show="showme == true">
+                        <div class="card">
+                            <h5>Pass vs Fail</h5>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{TestPassPre}}%; background-color: green">
+                                    {{TestPassPre}}%
+                                </div>
+                                <div class="progress-bar" role="progressbar" style="width: {{TestFailPre}}%; background-color: red">
+                                    {{TestFailPre}}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h5>Executed vs Not Executed</h5>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width:{{executed}}%; background-color: green">
+                                    {{executed}}%
+                                </div>
+                                <div class="progress-bar" role="progressbar" style="width:{{notExecuted}}%; background-color: gray">
+                                    {{ notExecuted}}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h5>Gui vs Api</h5>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{amountTestsGUI}}%; background-color: green">
+                                    {{amountTestsGUI}}%
+                                </div>
+                                <div class="progress-bar" role="progressbar" style="width: {{amountTestsAPI}}%; background-color: gray">
+                                    {{amountTestsAPI}}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h5>Favorite Enviroment</h5>
+                            <div ng-repeat="(x, y) in favEnviroment">
+                                <h6>{{x}}:<span class="badge badge-pill badge-dark pull-right">{{y}}%</span></h6>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid col-md-8">
+            <div class="card" style="position: relative;">
+                <h2><span class="fa fa-heart"></span> Health</h2>
+                <div class="cardcontainer" style="height: 460px">
+                    <canvas id="chartContainer" style="position: relative; max-height: 463px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container-fluid col-md-4">
+            <div class="card" style="position: relative; width: 100%">
+                <h2 ng-hide="hide">
+                    <span class="fa fa-line-chart"></span> Popular tests           
+                    <button class="fa fa-bars btn btn-dark pull-right" ng-click="hide = ! hide"></button>
+                </h2>
+                <h2 ng-show="hide">
+                    <span class="fa fa-line-chart"></span> Top failing tests                
+                    <button class="fa fa-bars btn btn-dark pull-right" ng-click="hide = ! hide"></button>
+                </h2>
+                <div class="cardcontainer" style="height: 460px">
+                    <div ng-show="hide" class="card" ng-repeat="(j,k) in testNameAndFailCount">
+                        <div>
+                            {{j}}
+                            <span class="badge badge-pill badge-dark pull-right" style="background-color:red" >{{k}}</span>
+                        </div>
+                    </div>
+                    <div ng-hide="hide" class="card" ng-repeat="(j,k) in testNameAndCount">
+                        <div>
+                            {{j}}
+                            <span class="badge badge-pill badge-dark pull-right">{{k}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid col-md-4">
+            <div class="card" style="position: relative; width: 100%">
+                <h2><span class="fa fa-magic"></span> Executed Tests</h2>
+                <div class="cardcontainer" style="height: 460px">
+                    <div class="card" ng-repeat="k in ranTests.TestRunResults">
+                        <i ng-if="k.Status != 'Executed'" class="fa fa-circle-o"> {{k.TestName}}</i>
+                        <i ng-if="k.Status == 'Executed'" class="fa fa-pass"> {{k.TestName}}</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid col-md-4">
+            <div class="card" style="position: relative;width: 100%">
+                <h2>
+                    <span class="fa fa-users"></span> User Scores
+                    <button class="fa fa-bars btn btn-dark pull-right" ng-click="hidden = ! hidden"></button>
+                </h2>
+                <div class="cardcontainer" style="height: 460px">
+                    <div ng-hide="hidden">
+                        <canvas id="TestetChart" style="position: relative; max-height: 470px;max-width:470px"></canvas>
+                    </div>
+                    <div ng-show="hidden" class="card" ng-repeat="(x, y) in testers">
+                        <div>
+                            <i class="fa fa-user" style="color: {{myColors[$index]}}; position: relative;"></i> {{x}}
+                            <span class="badge badge-pill badge-dark pull-right">{{y}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

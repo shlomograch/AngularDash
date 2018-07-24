@@ -1,0 +1,91 @@
+﻿<div ng-controller="TestRunsCtrl">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Filter Options
+                </div>
+                <div class="panel-body">
+                    <div class="form-group row">
+                        <label for="numTestRuns" class="col-sm-3 col-form-label">Number of test runs to view:</label>
+                        <div class="col-sm-9">
+                            <select id="numTestRuns" class="btn btn-light btn-outline-dark dropdown-toggle btn-block" placeholder="Select Number of Tests to View" ng-model="numTestRuns" ng-change="GetTestRuns()">
+                                <option id="num10">10</option>
+                                <option id="num25">25</option>
+                                <option id="num50">50</option>
+                                <option id="num100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="FilterFor" class="col-sm-3 col-form-label">Filter for:</label>
+                        <div class="col-sm-9">
+                            <input id="FilterFor" ng-model="testRunFilter" class="btn btn-light btn-outline-dark btn-block" placeholder="Filter. . ." type="text" />
+                        </div>
+                    </div>
+                </div>
+                <!--Consider putting ezpie chart for how many pass/fails/info's there are in selected test run set.-->
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 cardcontainer">
+            <table class="table table-bordered table-light table-hover table-responsive">
+                <tr ng-repeat="x in testRuns | filter: testRunFilter">
+                    <td id="{{x.TestRunKey}}" ng-class="{selected : x.TestRunKey === selectedTestRun}" ng-click="GetTestResults(x.TestRunKey)">
+                        <div class="panel panel-{{x.TestRunStatus.toLowerCase()}}">
+                            <div class="panel-heading text-center text-muted">
+                                {{x.TestName}}
+                                <div class="fa-pull-right" lazy-load="true" ng-click="GetCsv(x.TestRunKey)" ng-csv="getTestResultsCsv" csv-header="['Expected', 'Actual', 'ResultStatus']" filename="{{fileName}}.csv"><i class="fa fa-cloud-download"></i></div>
+                            </div>
+                            <div class="hbox text-center b-t b-light">
+                                <div class="col padder-v text-muted b-r b-light">
+                                    <div class="h6">{{x.Environment}}</div>
+                                </div>
+                                <div class="col padder-v text-muted b-r b-light">
+                                    <div class="h6">{{x.StartDateTime | date : "hh:mm a MMMM d" }}</div> <!--Convert to current timer.js date time format.-->
+                                </div>
+                                <div class="col padder-v text-muted">
+                                    <div class="h6">{{x.ExecutedBy}}</div>
+                                </div>
+                            </div>
+                            <div class="hbox text-center b-t b-light">
+                                <div class="col padder-v text-muted b-r b-light">
+                                    <div class="h6" ng-if="x.TestDescription == null">No description found.</div>
+                                    <div class="h6" ng-if="x.TestDescription !== null">{{x.TestDescription}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-8 cardcontainer" style="width: auto;">
+            <div ng-if="testResults != null">
+                <table class="table table-bordered table-light table-hover">
+                    <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Expected</th>
+                        <th>Actual</th>
+                    </tr>
+                    </thead>
+                    <tr ng-repeat="x in testResults">
+                        <td>
+                            <i class="fa fa-{{x.ResultStatus.toLowerCase()}}"></i>
+                        </td>
+                        <td>
+                            {{x.Expected}}
+                        </td>
+                        <td>
+                            <code>
+                                {{x.Actual}}
+                            </code>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

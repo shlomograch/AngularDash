@@ -1,0 +1,1 @@
+﻿angular.module('testRunsModule', ['testRunsController', 'testRunsDirective', 'testRunsService']);
